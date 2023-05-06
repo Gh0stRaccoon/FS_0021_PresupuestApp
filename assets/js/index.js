@@ -19,6 +19,7 @@ function openModal(e) {
 		: (dialog.dataset.type = 'gasto');
 
 	const type = dialog.dataset.type;
+	modalButton.classList.add(`${type === "ingreso" ? 'add' : 'expense'}`)
 	modalButton.textContent = `Agregar ${type}`;
 	dialog.setAttribute('open', true);
 	form[0].focus();
@@ -39,8 +40,7 @@ function handleSubmit(e) {
 	movements.push(newMovement);
 
 	renderMovements();
-	dialog.removeAttribute('open');
-	form.reset();
+	closeModal()
 }
 
 function removeItem(e) {
@@ -100,12 +100,24 @@ function renderTotals() {
 	const gastosField = document.getElementById('totalGastos');
 	const saldoField = document.getElementById('totalSaldo');
 
-	spendingField.textContent = `${
-		spendingPercent > 100 ? 100 : Math.round(spendingPercent) || 0
-	}%`;
+	spendingField.textContent = `${spendingPercent > 100 ? 100 : Math.round(spendingPercent) || 0
+		}%`;
 	presupuestoField.textContent = toCurrency(totalIngresos);
 	gastosField.textContent = toCurrency(totalGastos);
 	saldoField.textContent = toCurrency(totalSaldo);
+}
+
+function escapeToExit(e) {
+	e.key === 'Escape' && closeModal();
+}
+
+function closeModal() {
+	const modalButton = document.querySelector('.budget-modal button');
+
+	dialog.removeAttribute('open');
+	modalButton.removeAttribute('class');
+
+	form.reset();
 }
 
 function toCurrency(value) {
@@ -116,6 +128,8 @@ function toCurrency(value) {
 
 	return CLP.format(value);
 }
+
+dialog.addEventListener('keydown', escapeToExit);
 
 btnIncome.addEventListener('click', openModal);
 btnExpense.addEventListener('click', openModal);
